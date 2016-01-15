@@ -11,6 +11,7 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
+            ViewBag.Environment = ConfigurationManager.AppSettings["Environment"];
             ViewBag.ReleaseNumber = ConfigurationManager.AppSettings["OctopusReleaseNumber"];
             ViewBag.DeploymentNumber = ConfigurationManager.AppSettings["OctopusDeploymentId"];
       
