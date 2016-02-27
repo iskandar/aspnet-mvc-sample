@@ -3,18 +3,25 @@
 }
 
 <div class="jumbotron">
-    <h1>Test App</h1>
+    <h1>App v@ViewBag.ApplicationVersion</h1>
     <p class="lead">This application is for testing Windows-oriented CI/CD pipelines. </p>
     <ul>
         <li>Hostname: @ViewBag.Hostname</li>
         <li>Environment: @ViewBag.Environment</li>
         <li>Application Version: @ViewBag.ApplicationVersion</li>
-        <li>Application Build Number: @ViewBag.BuildNumber</li>
-        <li>Application Build Hash: @ViewBag.BuildHash</li>
-        <li>Application Build Date: @ViewBag.BuildDate</li>
-        <li>Application Build URL: <a href="@ViewBag.BuildUrl" target="_blank">@ViewBag.BuildUrl</a></li>
-        <li>Application Release Number: @ViewBag.ReleaseNumber</li>
-        <li>Application Deployment Number: @ViewBag.DeploymentNumber</li>
+        <li>Build Number: @ViewBag.BuildNumber</li>
+        <li>
+            Build Hash:
+            <a href="https://github.com/iskandar/aspnet-mvc-sample/commit/@ViewBag.BuildHash"
+                target="_blank">@ViewBag.BuildHash</a>
+        </li>
+        <li>Build Date: @ViewBag.BuildDate</li>
+        <li>
+            Build URL:
+            <a href="@ViewBag.BuildUrl" target="_blank">@ViewBag.BuildUrl</a>
+        </li>
+        <li>Release Number: @ViewBag.ReleaseNumber</li>
+        <li>Deployment Number: @ViewBag.DeploymentNumber</li>
         <li>Runtime: @ViewBag.Runtime</li>
         <li>CLR Version: @ViewBag.ClrVersion</li>
         <li>MVC Version: @ViewBag.MvcVersion</li>
@@ -50,8 +57,5 @@
         <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
     </div>
 </div>
