@@ -22,7 +22,8 @@ namespace WebApplication1.Controllers
             var isMono = Type.GetType("Mono.Runtime") != null;
 
             ViewBag.MvcVersion = mvcName.Version.Major + "." + mvcName.Version.Minor;
-            ViewBag.Runtime = (isMono ? "Mono" : ".NET") + " " + Environment.Version.ToString();
+            ViewBag.Runtime = (isMono ? "Mono" : ".NET");
+            ViewBag.ClrVersion = Environment.Version.ToString();
 
             return View();
         }
