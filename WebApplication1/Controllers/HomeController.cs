@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
+using System.Collections;
 
 namespace WebApplication1.Controllers
 {
@@ -19,7 +20,6 @@ namespace WebApplication1.Controllers
             ViewBag.BuildDate = ConfigurationManager.AppSettings["BuildDate"];
             ViewBag.BuildUrl = ConfigurationManager.AppSettings["BuildUrl"];
             ViewBag.DeployNumber = ConfigurationManager.AppSettings["DeployNumber"];
-            ViewBag.ReleaseNumber = ConfigurationManager.AppSettings["ReleaseNumber"];
       
             var mvcName = typeof(Controller).Assembly.GetName();
             var isMono = Type.GetType("Mono.Runtime") != null;
@@ -27,6 +27,16 @@ namespace WebApplication1.Controllers
             ViewBag.MvcVersion = mvcName.Version.Major + "." + mvcName.Version.Minor;
             ViewBag.Runtime = (isMono ? "Mono" : ".NET");
             ViewBag.ClrVersion = Environment.Version.ToString();
+
+            var dict = Environment.GetEnvironmentVariables();
+            var stringList = new List<String>();
+
+            foreach (DictionaryEntry de in dict) {
+                Console.WriteLine("  {0} = {1}", de.Key, de.Value);
+                stringList.Add(de.Key + " = " + de.Value);
+            }
+            stringList.Sort();
+            ViewData["EnvironmentVars"] = stringList;
 
             return View();
         }
