@@ -11,15 +11,18 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
+            ViewBag.Hostname = Environment.MachineName;
             ViewBag.Environment = ConfigurationManager.AppSettings["Environment"];
+            ViewBag.BuildNumber = ConfigurationManager.AppSettings["BuildNumber"];
+            ViewBag.BuildHash = ConfigurationManager.AppSettings["BuildHash"];
             ViewBag.ReleaseNumber = ConfigurationManager.AppSettings["OctopusReleaseNumber"];
-            ViewBag.DeploymentNumber = ConfigurationManager.AppSettings["OctopusDeploymentId"];
+            ViewBag.DeployNumber = ConfigurationManager.AppSettings["DeployNumber"];
       
             var mvcName = typeof(Controller).Assembly.GetName();
             var isMono = Type.GetType("Mono.Runtime") != null;
 
             ViewBag.MvcVersion = mvcName.Version.Major + "." + mvcName.Version.Minor;
-            ViewBag.Runtime = isMono ? "Mono" : ".NET";
+            ViewBag.Runtime = (isMono ? "Mono" : ".NET") + " " + Environment.Version.ToString();
 
             return View();
         }
