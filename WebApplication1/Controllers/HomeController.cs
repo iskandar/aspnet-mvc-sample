@@ -12,11 +12,14 @@ namespace WebApplication1.Controllers
         public ActionResult Index()
         {
             ViewBag.Hostname = Environment.MachineName;
+            ViewBag.ApplicationVersion = ConfigurationManager.AppSettings["ApplicationVersion"];
             ViewBag.Environment = ConfigurationManager.AppSettings["Environment"];
             ViewBag.BuildNumber = ConfigurationManager.AppSettings["BuildNumber"];
             ViewBag.BuildHash = ConfigurationManager.AppSettings["BuildHash"];
-            ViewBag.ReleaseNumber = ConfigurationManager.AppSettings["OctopusReleaseNumber"];
+            ViewBag.BuildDate = ConfigurationManager.AppSettings["BuildDate"];
+            ViewBag.BuildUrl = ConfigurationManager.AppSettings["BuildUrl"];
             ViewBag.DeployNumber = ConfigurationManager.AppSettings["DeployNumber"];
+            ViewBag.ReleaseNumber = ConfigurationManager.AppSettings["ReleaseNumber"];
       
             var mvcName = typeof(Controller).Assembly.GetName();
             var isMono = Type.GetType("Mono.Runtime") != null;
