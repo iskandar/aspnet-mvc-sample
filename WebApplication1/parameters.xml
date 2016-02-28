@@ -10,7 +10,7 @@
   </parameter>
   <parameter name="DeployNumber"
     description="Please provide a deployment number."
-    defaultValue="">
+    defaultValue="0">
     <parameterEntry
       kind="XmlFile"
       scope="\\web.config$"
@@ -18,7 +18,7 @@
   </parameter>
   <parameter name="DeployDate"
     description="Please provide a deployment date."
-    defaultValue="">
+    defaultValue="UNSET">
     <parameterEntry
       kind="XmlFile"
       scope="\\web.config$"
@@ -26,7 +26,7 @@
   </parameter>
   <parameter name="DeployUrl"
     description="Please provide a deployment URL."
-    defaultValue="">
+    defaultValue="http://example.com">
     <parameterEntry
       kind="XmlFile"
       scope="\\web.config$"
