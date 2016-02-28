@@ -20,7 +20,9 @@ namespace WebApplication1.Controllers
             ViewBag.BuildDate = ConfigurationManager.AppSettings["BuildDate"];
             ViewBag.BuildUrl = ConfigurationManager.AppSettings["BuildUrl"];
             ViewBag.DeployNumber = ConfigurationManager.AppSettings["DeployNumber"];
-      
+            ViewBag.DeployDate = ConfigurationManager.AppSettings["DeployDate"];
+            ViewBag.DeployUrl = ConfigurationManager.AppSettings["DeployUrl"];
+
             var mvcName = typeof(Controller).Assembly.GetName();
             var isMono = Type.GetType("Mono.Runtime") != null;
 

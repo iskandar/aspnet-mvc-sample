@@ -9,7 +9,7 @@
     <p class="lead">This application is for testing Windows-oriented CI/CD pipelines. </p>
     <ul>
         <li>Hostname: @ViewBag.Hostname</li>
-        <!-- <li>Environment: @ViewBag.Environment</li> -->
+        <li>Environment: @ViewBag.Environment</li>
         <li>Application Version: @ViewBag.ApplicationVersion</li>
         <li>Build Number: @ViewBag.BuildNumber</li>
         <li>
@@ -22,8 +22,12 @@
             Build URL:
             <a href="@ViewBag.BuildUrl" target="_blank">@ViewBag.BuildUrl</a>
         </li>
-        <li>Release Number: @ViewBag.ReleaseNumber</li>
-        <li>Deployment Number: @ViewBag.DeploymentNumber</li>
+        <li>Deploy Number: @ViewBag.DeployNumber</li>
+        <li>Deploy Date: @ViewBag.DeployDate</li>
+        <li>
+            Deploy URL:
+            <a href="@ViewBag.DeployUrl" target="_blank">@ViewBag.DeployUrl</a>
+        </li>
         <li>Runtime: @ViewBag.Runtime</li>
         <li>MVC Version: @ViewBag.MvcVersion</li>
         <li>CLR Version: @ViewBag.ClrVersion</li>

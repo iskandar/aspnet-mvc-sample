@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="Environment"
+    description="Please provide an environment name."
+    defaultValue="dev">
+    <parameterEntry
+      kind="XmlFile"
+      scope="\\web.config$"
+      match="//configuration/appSettings/add[@key='Environment']/@value" />
+  </parameter>
+  <parameter name="DeployNumber"
+    description="Please provide a deployment number."
+    defaultValue="">
+    <parameterEntry
+      kind="XmlFile"
+      scope="\\web.config$"
+      match="//configuration/appSettings/add[@key='DeployNumber']/@value" />
+  </parameter>
+  <parameter name="DeployDate"
+    description="Please provide a deployment date."
+    defaultValue="">
+    <parameterEntry
+      kind="XmlFile"
+      scope="\\web.config$"
+      match="//configuration/appSettings/add[@key='DeployDate']/@value" />
+  </parameter>
+  <parameter name="DeployUrl"
+    description="Please provide a deployment URL."
+    defaultValue="">
+    <parameterEntry
+      kind="XmlFile"
+      scope="\\web.config$"
+      match="//configuration/appSettings/add[@key='DeployUrl']/@value" />
+  </parameter>
+</parameters>
