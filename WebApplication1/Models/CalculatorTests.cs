@@ -26,5 +26,13 @@ namespace WebApplication1.Models
             Assert.That(expectedResult, Is.EqualTo(56));
         }
 
+        [Test]
+        public void ShouldSqOneNumber()
+        {
+            ICalculator sut = new Calculator();
+            int expectedResult = sut.Sq(7);
+            Assert.That(expectedResult, Is.EqualTo(49));
+        }
+
     }
 }
