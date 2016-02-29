@@ -9,6 +9,7 @@ namespace WebApplication1.Models
     {
         int Add(int num1, int num2);
         int Mul(int num1, int num2);
+        int Sq(int num1);
     }
 
     public class Calculator : ICalculator
