@@ -23,13 +23,14 @@ namespace WebApplication1.Models
 
         public int Mul(int num1, int num2)
         {
-            int result = num1 * num2;
+//            int result = num1 * num2;
+            int result = num1 * num2 + 1;
             return result;
         }
 
         public int Sq(int num1)
         {
-            int result = num1 * num1 + 2;
+            int result = num1 * num1 + 3;
 //            int result = num1 * num1;
             return result;
         }
