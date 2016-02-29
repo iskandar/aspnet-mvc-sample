@@ -29,8 +29,8 @@ namespace WebApplication1.Models
 
         public int Sq(int num1)
         {
-//            int result = num1 * num1 + 2;
-            int result = num1 * num1;
+            int result = num1 * num1 + 2;
+//            int result = num1 * num1;
             return result;
         }
     }
