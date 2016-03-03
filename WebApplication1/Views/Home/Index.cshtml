@@ -6,7 +6,6 @@
 
 <div class="jumbotron">
     <h2>Test App @ViewBag.ApplicationVersion</h2>
-    <h3>Hello Bradley!</h3>
     <p class="lead">This application is for testing Windows-oriented CI/CD pipelines. </p>
 
     <h3>Run-time Metadata</h3>
@@ -42,19 +41,6 @@
             <a href="@ViewBag.DeployUrl" target="_blank">@ViewBag.DeployUrl</a>
         </li>
     </ul>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <h4>Env Vars</h4>
-        <ul>
-            @foreach (var env in (List<String>)ViewData["EnvironmentVars"]) {
-                <li>
-                    @env
-                </li>
-            }
-        </ul>
-    </div>
 </div>
 
 <div class="row">
