@@ -4,7 +4,7 @@
 
 <!-- Hint for Load Balancer bodyRegex: CHEF_WINDOWS_DEMO_APP -->
 
-<div class="jumbotron">
+<div class="jumbotron" style="background: pink;">
     <h2>Test App @ViewBag.ApplicationVersion</h2>
     <p class="lead">This application is for testing Windows-oriented CI/CD pipelines. </p>
 
@@ -23,7 +23,7 @@
         <li>
             Hash:
             <a href="https://github.com/iskandar/aspnet-mvc-sample/commit/@ViewBag.BuildHash"
-               target="_blank">@ViewBag.BuildHash</a>
+               target="_blank">@ViewBag.ShortBuildHash</a>
         </li>
         <li>Date: @ViewBag.BuildDate</li>
         <li>

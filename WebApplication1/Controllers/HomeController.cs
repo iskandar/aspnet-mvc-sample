@@ -17,6 +17,7 @@ namespace WebApplication1.Controllers
             ViewBag.Environment = ConfigurationManager.AppSettings["Environment"];
             ViewBag.BuildNumber = ConfigurationManager.AppSettings["BuildNumber"];
             ViewBag.BuildHash = ConfigurationManager.AppSettings["BuildHash"];
+            ViewBag.ShortBuildHash = ConfigurationManager.AppSettings["BuildHash"].Substring(0, 8)
             ViewBag.BuildDate = ConfigurationManager.AppSettings["BuildDate"];
             ViewBag.BuildUrl = ConfigurationManager.AppSettings["BuildUrl"];
             ViewBag.DeployNumber = ConfigurationManager.AppSettings["DeployNumber"];
