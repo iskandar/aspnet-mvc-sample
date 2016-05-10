@@ -1,35 +1,67 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <parameter name="Environment"
-    description="Please provide an environment name."
-    defaultValue="dev">
-    <parameterEntry
-      kind="XmlFile"
-      scope="\\web.config$"
-      match="//configuration/appSettings/add[@key='Environment']/@value" />
-  </parameter>
-  <parameter name="DeployNumber"
-    description="Please provide a deployment number."
-    defaultValue="0">
-    <parameterEntry
-      kind="XmlFile"
-      scope="\\web.config$"
-      match="//configuration/appSettings/add[@key='DeployNumber']/@value" />
-  </parameter>
-  <parameter name="DeployDate"
-    description="Please provide a deployment date."
-    defaultValue="UNSET">
-    <parameterEntry
-      kind="XmlFile"
-      scope="\\web.config$"
-      match="//configuration/appSettings/add[@key='DeployDate']/@value" />
-  </parameter>
-  <parameter name="DeployUrl"
-    description="Please provide a deployment URL."
-    defaultValue="http://example.com">
-    <parameterEntry
-      kind="XmlFile"
-      scope="\\web.config$"
-      match="//configuration/appSettings/add[@key='DeployUrl']/@value" />
-  </parameter>
+    <parameter name="Environment"
+               description="Please provide an environment name."
+               defaultValue="dev">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='Environment']/@value"/>
+    </parameter>
+    <parameter name="DeployNumber"
+               description="Please provide a deployment number."
+               defaultValue="0">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DeployNumber']/@value"/>
+    </parameter>
+    <parameter name="DeployDate"
+               description="Please provide a deployment date."
+               defaultValue="UNSET">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DeployDate']/@value"/>
+    </parameter>
+    <parameter name="DeployUrl"
+               description="Please provide a deployment URL."
+               defaultValue="http://example.com">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DeployUrl']/@value"/>
+    </parameter>
+    <parameter name="DatabaseHost"
+               description="Please provide a database host name or IP"
+               defaultValue="127.0.0.1">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DatabaseHost']/@value"/>
+    </parameter>
+    <parameter name="DatabaseName"
+               description="Please provide a database name"
+               defaultValue="dbName">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DatabaseName']/@value"/>
+    </parameter>
+    <parameter name="DatabaseUser"
+               description="Please provide a database user"
+               defaultValue="dbUser">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DatabaseUser']/@value"/>
+    </parameter>
+    <parameter name="DatabasePassword"
+               description="Please provide a database password"
+               defaultValue="dbPassword">
+        <parameterEntry
+                kind="XmlFile"
+                scope="\\web.config$"
+                match="//configuration/appSettings/add[@key='DatabasePassword']/@value"/>
+    </parameter>
 </parameters>
