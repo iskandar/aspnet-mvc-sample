@@ -1,0 +1,60 @@
+queue:
+  name: Hosted VS2017
+  demands: 
+    - msbuild
+    - visualstudio
+    - vstest
+
+variables:
+  # @TODO make this a secret somewhere?
+  Slack.APIToken: 'xxx'
+  BuildPlatform: Any CPU
+  BuildConfiguration: Release
+
+steps:
+  # - task: louisgerard.slackposter.slackposterbuild.SlackPoster@0
+  #   inputs:
+  #     UserName: 'VSTS'
+  #     Message: 'Demo .NET Core Build $(Build.BuildNumber) started'
+  #     ApiToken: '$(Slack.APIToken)'
+  #     Channel: '#rdps-0000-firehose'
+
+  - task: NuGetToolInstaller@0
+
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: 'WebApplication1.sln'
+
+  - task: VSBuild@1
+    inputs:
+      solution: 'WebApplication1.sln'
+      msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"'
+      platform: '$(BuildPlatform)'
+      configuration: '$(BuildConfiguration)'
+
+  - task: VSTest@2
+    inputs:
+      testAssemblyVer2: |
+            **\$(BuildConfiguration)\*test*.dll
+            !**\obj\**
+      platform: '$(BuildPlatform)'
+      configuration: '$(BuildConfiguration)'
+
+  - task: PublishSymbols@1
+    inputs:
+      SearchPattern: '**\bin\**\*.pdb'
+    continueOnError: true
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      ArtifactName: 'drop'
+      ArtifactType: 'Container'
+
+  # - task: louisgerard.slackposter.slackposterbuild.SlackPoster@0
+  #   inputs:
+  #     UserName: 'VSTS'
+  #     Message: 'Demo .NET Core Build $(Build.BuildNumber) finished'
+  #     ApiToken: '$(Slack.APIToken)'
+  #     Channel: '#rdps-0000-firehose'
+
