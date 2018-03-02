@@ -29,7 +29,11 @@ param(
     [string] $TeamProject = "MyFirstProject",
     
     # VSTS Deployment Group
-    [string] $DeploymentGroup = "dg-01"
+    [string] $DeploymentGroup = "dg-01",
+
+    # If Dry Run, we don't actually do anything
+    [string] $DryRun = "No"
+
 )
 
 $VerbosePreference = "Continue"
@@ -37,6 +41,13 @@ $VerbosePreference = "Continue"
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
 Start-Transcript -Path $Dir\logs\Configure-Server.log -Append
 Push-Location -Path $Dir
+
+if ($DryRun -eq "Yes") {
+    Write-Verbose "----> Dry Run, skipping all activities."
+    Pop-Location
+    Stop-Transcript
+    exit(0)
+}
 
 # Get data from Instance metadata
 # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service
@@ -84,9 +95,11 @@ Set-PSRepository -InstallationPolicy Trusted -name PSGallery
 
 # Install PS modules.
 $modules = @(
-    'AzureRM'
-    'WebPI.PS'
+    'AzureRM.Compute'
+    'AzureRM.KeyVault'
+    'AzureRM.Profile'
     'Azure.Storage'
+    'WebPI.PS'
 )
 Write-Verbose "----> Installing PowerShell Modules"
 foreach($module in $modules) 
