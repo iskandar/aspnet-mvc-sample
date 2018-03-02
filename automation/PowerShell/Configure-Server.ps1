@@ -4,6 +4,10 @@ param(
     # Name of the current VM or VMSS
     [string] $VmName,
 
+    # Namespace for this VM
+    [Parameter(Mandatory=$True)]
+    [string] $Namespace,
+
     # Working directory
     [string] $Dir = "C:\cloud-automation",
 
@@ -43,6 +47,7 @@ $Metadata = $(Invoke-RestMethod `
 # Create an object with our create-time Environment-specific configuration
 $Config = @{
     "VmName" = $VmName
+    "Namespace" = $Namespace
     "Environment" = $Environment
     "ArtefactStorageAccount" = $ArtefactStorageAccount
     "ArtefactContainer" = $ArtefactContainer
