@@ -19,7 +19,7 @@ param(
 
     # VSTS Account Name
     [Parameter(Mandatory=$True)]
-    [string] $VSTSAccountName,
+    [string] $VstsAccountName,
 
     # VSTS Team Project
     [string] $TeamProject = "MyFirstProject",
@@ -64,30 +64,55 @@ Get-WmiObject -Class Win32_Processor -ComputerName . | Select-Object -Property [
 
 # Set up PS packages sources and repositories
 Install-PackageProvider -Name NuGet -Force
+if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
+{
+    Write-Verbose 'Installing Package Provider nuget'
+    Install-PackageProvider -Name nuget -Force
+}
 # Let's trust the PSGallery source
 Set-PackageSource -Trusted -Name PSGallery -ProviderName PowerShellGet
 Set-PSRepository -InstallationPolicy Trusted -name PSGallery
 
 # Install PS modules.
-Install-Module -Name PowerShellGet -Force
-Install-Module -Name AzureRM -AllowClobber
-Install-Module -Name Azure.Storage
-Install-Module -Name WebPI.PS
-
-# Import Modules (useful when running in the ISE)
-Import-Module -Name AzureRM 
-Import-Module -Name Azure.Storage
-Import-Module -Name WebPI.PS
+$modules = @(
+    'AzureRM'
+    'WebPI.PS'
+    'Azure.Storage'
+)
+foreach($module in $modules) 
+{
+    if (!(Get-Module -Name $module -ListAvailable) )
+    {
+        Write-Verbose "Installing PowerShell Module $module"
+        Install-Module $module -Force
+        # Import Modules (useful when running in the ISE)
+        Import-Module -Name $module
+    } 
+}
 
 # Let's install some bare-minimum Windows Features
-Install-WindowsFeature Web-Server 
-Install-WindowsFeature Web-Asp-Net45
-Install-WindowsFeature Web-Mgmt-Service
-Install-WindowsFeature Web-Mgmt-Console
+$features = @(
+    'Web-Server'
+    'Web-Asp-Net45'
+    'Web-Mgmt-Service'
+    'Web-Mgmt-Console'
+)
+foreach($feature in $features) 
+{
+    Write-Verbose "Installing Windows Feature $feature"
+    Install-WindowsFeature $feature
+}
 
 # Install Web Platform Installer packages
-Invoke-WebPI /Install /Products:UrlRewrite2 /AcceptEula
-Invoke-WebPI /Install /Products:WDeploy36PS /AcceptEula
+$packages = @(
+    'UrlRewrite2'
+    'WDeploy36PS'
+)
+foreach($package in $packages) 
+{
+    Write-Verbose "Installing Web Package $package"
+    Invoke-WebPI /Install /Products:$package /AcceptEula
+}
 
 Pop-Location
 Stop-Transcript
