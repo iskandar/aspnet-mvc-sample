@@ -50,12 +50,7 @@ $modules = @(
     'AzureRM.Compute'
     # 'AzureRM.KeyVault'
     'AzureRM.Profile'
-    'Azure.Storage'    
-    # 'WebPI.PS' 
-    # NOTE: WebPI.PS is a community module and will need to be either
-    # vetted & forked or replaced with something else (like a direct install from .MSI)
-    # @TODO Kill WebPI and use a direct Web Deploy installation method. WebPI is slow.
-    # @see https://www.iis.net/downloads/microsoft/web-deploy#additionalDownloads
+    'Azure.Storage'
 )
 Write-Host "`n[$(Get-Date)] ----> Installing PowerShell Modules"
 foreach($module in $modules) 
@@ -73,7 +68,6 @@ Set-PSRepository -InstallationPolicy Untrusted -name PSGallery
 # Let's install some bare-minimum Windows Features
 $features = @(
     'Web-Server'
-    #'Web-Asp-Net' # Needed by WebPI
     'Web-Asp-Net45'
     'Web-Mgmt-Service'
     'Web-Mgmt-Console'
@@ -86,30 +80,16 @@ foreach($feature in $features)
     Install-WindowsFeature $feature
 }
 
-# Install Web Platform Installer packages
-# THIS DOESN'T WORK AS A SYSTEM USER. Replace with direct download&install or DSC fragment
-# $packages = @(
-#     'UrlRewrite2'
-#     'WDeploy36PS'
-# )
-# Write-Host "`n----> Installing Web Platform Installer packages"
-# foreach($package in $packages) 
-# {
-#     Write-Host "`n==> $package"
-#     Invoke-WebPI /Install /Products:$package /AcceptEula
-# }
-
-# Write-Host "`n----> All installed Web Platform Installer packages:"
-# Invoke-WebPI /List /ListOption:Installed
-
 $Installed = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
 if (-not $Installed) {
     Write-Host "`n[$(Get-Date)] ----> Downloading WebDeploy installer [$(Get-Date)]"
     curl -UseBasicParsing -Verbose `
         -OutFile artefacts/webdeploy.msi `
         http://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi
+
     Write-Host "`n[$(Get-Date)] ----> Installing WebDeploy"
-    msiexec /L logs/msdeployinstall.log  /q /norestart /I artefacts/webdeploy.msi
+    # msiexec works best with absolute filesystem paths
+    msiexec /L $Dir\logs\WebDeploy-Install.log /quiet /norestart /package $Dir\artefacts\webdeploy.msi
 }
 
 Write-Host "`n`n[$(Get-Date)] ---->All Done!"
