@@ -104,7 +104,7 @@ do {
         continue    
     }
     if ($retry -gt $maxRetries) { throw "Could not find WebDeploy. Did installation fail?"}
-    Write-Host "[$(Get-Date)]  ==> Sleeping for $retryDelay seconds..."
+    Write-Host "[$(Get-Date)]   ==> Sleeping for $retryDelay seconds..."
     Start-Sleep $retryDelay
 } while(-not $Installed) 
 

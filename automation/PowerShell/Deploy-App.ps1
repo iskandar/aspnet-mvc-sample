@@ -100,10 +100,10 @@ function DeployApplication([string] $ApplicationId)
 
     if ($ArtefactVersion -eq "latest") {
         $ArtefactVersion = (Get-Content $LocalMetadata -Raw).trim()
-        Write-Host "==> Using latest version from environment metadata"
+        Write-Host "  ==> Using latest version from environment metadata"
     }
 
-    Write-Host "==> $($ApplicationId) version: $($ArtefactVersion)"
+    Write-Host "  ==> $($ApplicationId) version: $($ArtefactVersion)"
     $ArtefactName = "$($ApplicationId).zip"
 
     # Get our artefact
@@ -159,7 +159,7 @@ function DeployApplication([string] $ApplicationId)
             "-setparam:name='DeployUrl',value='$($DeployUrl)'",
             "-allowUntrusted")
         
-    Write-Host "`n----> arguments for msdeploy.exe"
+    Write-Host "`n----> Arguments for msdeploy.exe"
     $arguments
     
     Write-Host "`n----> Running $($msdeploy)"
