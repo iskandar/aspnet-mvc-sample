@@ -147,15 +147,9 @@ foreach($RemoteAsset in $RemoteAssets) {
     Write-Host "  ==> $($RemoteAsset.File)"
     $Url = "$($Provisioning.ProvisioningBaseUrl)$($RemoteAsset.Path)$($RemoteAsset.File)$($Provisioning.ProvisioningUrlSuffix)"
     curl -Verbose -UseBasicParsing `
-        -OutFile $($RemoteAsset.Path)$($RemoteAsset.File) `
+        -OutFile "$($Dir)\$($RemoteAsset.Path)$($RemoteAsset.File)" `
         $Url
 }
-
-Write-Verbose "`n----> Copying all assets to $Dir"
-Copy-Item -Path .\* -Destination $Dir -recurse -Force
-
-Push-Location -Path $Dir
-
 # Set up the Nuget package provider
 if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
 {
@@ -228,20 +222,23 @@ while(!$success) {
     }
 }
 
+Write-Host "`n----> Entering working directory"
+Push-Location -Path $Dir
+
 Write-Host "`n----> App Metadata:"
-$Apps = $(. .\Apps.ps1)
+$Apps = $(. $Dir\Apps.ps1)
 $Apps
 
 Write-Host "`n----> Done! Delegating to other scripts..."
 Stop-Transcript
 
 Write-Host "`n----> Running Configure-Server"
-$Dir\Configure-Server.ps1 `
+& "$Dir\Configure-Server.ps1" `
     -DryRun $DryRun `
-    -Dir $Dir 
+    -Dir $Dir
 
 Write-Host "`n----> Running Register-VstsAgent"
-$Dir\Register-VstsAgent.ps1 `
+& "$Dir\Register-VstsAgent.ps1" `
     -DryRun $DryRun `
     -VstsAccountName "$($Provisioning.VstsAccountName)" `
     -VstsTeamProject "$($Provisioning.VstsTeamProject)" `
@@ -257,7 +254,7 @@ foreach($ApplicationId in $ApplicationIds) {
     }
     $AppMetadata = $Apps.$ApplicationId
     Write-Host "  ==> $($ApplicationId): $($AppMetadata.WebSiteName)"
-    $Dir\Deploy-App.ps1 `
+    & "$Dir\Deploy-App.ps1" `
         -DryRun $DryRun `
         -Dir $Dir `
         -DeployNumber "Release-Local" `
