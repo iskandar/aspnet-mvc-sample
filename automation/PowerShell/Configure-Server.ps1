@@ -41,7 +41,7 @@ if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailab
 
 # Let's trust the PSGallery source
 # WARNING: This may be a security issue, please don't continue blindly using this.
-Write-Host "`n----> Setting up policies for PowerShellGallery source"
+Write-Host "`n----> Setting up policies for PowerShellGallery sources"
 Set-PackageSource -Trusted -Name PSGallery -ProviderName PowerShellGet
 Set-PSRepository -InstallationPolicy Trusted -name PSGallery
 
@@ -66,6 +66,9 @@ foreach($module in $modules)
     # Import Modules (useful when running in the ISE)
     # Import-Module -Name $module
 }
+
+Write-Host "`n----> Un-Trusting PowerShellGallery Modules"
+Set-PSRepository -InstallationPolicy Untrusted -name PSGallery
 
 # Let's install some bare-minimum Windows Features
 $features = @(

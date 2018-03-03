@@ -127,6 +127,9 @@ if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailab
     Install-PackageProvider -Name nuget -Force
 }
 
+Write-Host "`n----> Trusting PowerShellGallery Modules"
+Set-PSRepository -InstallationPolicy Trusted -name PSGallery
+
 Write-Host "`n----> Installing minimal PS Module requirements"
 Install-Module 'AzureRM.Profile'
 

@@ -167,6 +167,7 @@ function DeployApplication([string] $ApplicationId)
         echo $job.StandardError
         throw('msdeploy exited with an error. ExitCode:' + $job.ExitCode)
     }
+    Write-Host "`n----> Done deploying $($ApplicationId)"
 }
 
 
