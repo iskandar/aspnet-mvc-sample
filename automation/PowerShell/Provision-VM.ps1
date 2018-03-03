@@ -43,10 +43,11 @@ param(
     [string] $VstsDeploymentGroup = "dg-01",
     
     # VSTS Personal Access Token
+    # Not used!
     [string] $VstsPat,
 
     # Name of the Key Vault
-    [string] $KeyVaultName = "iskdemo01-kv",
+    [string] $KeyVault = "iskdemo01-kv",
 
     # Application IDs to install automatically
     [string[]] $ApplicationIds = @("WebApplication1"),
@@ -80,10 +81,11 @@ $Provisioning = @{
     "ArtefactResourceGroup" = $ArtefactResourceGroup
     "ArtefactStorageAccount" = $ArtefactStorageAccount
     "ArtefactContainer" = $ArtefactContainer
-    "KeyVaultName" = $KeyVaultName
-    "VstsAccountName" = $VSTSAccountName
-    "TeamProject" = $TeamProject
-    "DeploymentGroup" = $DeploymentGroup
+    "KeyVault" = $KeyVault
+    # VSTS Settings
+    "VstsAccountName" = $VstsAccountName
+    "VstsTeamProject" = $VstsTeamProject
+    "VstsDeploymentGroup" = $VstsDeploymentGroup
     # Application List
     "ApplicationIds" = $ApplicationIds
     # Add Instance Metadata
@@ -154,8 +156,9 @@ while(!$success) {
 }
 
  Write-Host "`n----> Running Configure-Server"
-.\Configure-Server.ps1 -DryRun Yes -Dir $Dir 
-
+.\Configure-Server.ps1 `
+    -DryRun No `
+    -Dir $Dir 
 
 Write-Host "`n----> Running Deploy-App"
 foreach($ApplicationId in $ApplicationIds) {
