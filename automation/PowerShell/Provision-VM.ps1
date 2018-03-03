@@ -20,6 +20,12 @@ param(
     # Namespace for this VM
     [string] $Namespace = "dx-01",
     
+    # Base URL containing Provisioning scripts
+    [string] $ProvisioningBaseUrl,
+
+    # URL suffix, which may contain an SAS token
+    [string] $ProvisioningUrlSuffix,    
+
     # Name of the Artefact Subscription ID.
     # Defaults to current Subscription
     [string] $ArtefactSubscriptionId,   
@@ -178,7 +184,7 @@ while(!$success) {
 
 Write-Host "`n----> App Metadata:"
 $Apps = $(. .\Apps.ps1)
-AppMetadata
+$Apps
 
 Write-Host "`n----> Done! Delegated to other scripts..."
 Stop-Transcript
