@@ -85,19 +85,26 @@ $Metadata = $(Invoke-RestMethod `
 if (-not (Test-Path $Dir\Provisioning.json)) {
     $ArtefactSubscriptionId = if ($ArtefactSubscriptionId) { $ArtefactSubscriptionId } else { $Metadata.compute.subscriptionId }
     $Provisioning = @{
+        # General values
         "Environment" = $Environment
         "Namespace" = $Namespace
+        # Provisioning source
+        "ProvisioningBaseUrl" = $ProvisioningBaseUrl
+        "ProvisioningUrlSuffix" = "not-stored"
+        # Artefact Storage values
         "ArtefactSubscriptionId" = $ArtefactSubscriptionId
         "ArtefactResourceGroup" = $ArtefactResourceGroup
         "ArtefactStorageAccount" = $ArtefactStorageAccount
         "ArtefactContainer" = $ArtefactContainer
-        "KeyVault" = $KeyVault
         # VSTS Settings
         "VstsAccountName" = $VstsAccountName
         "VstsTeamProject" = $VstsTeamProject
         "VstsDeploymentGroup" = $VstsDeploymentGroup
+        "VstsPat" = "not-stored"
         # Application List
         "ApplicationIds" = $ApplicationIds
+        # KeyVault values
+        "KeyVault" = $KeyVault
         # Add Instance Metadata
         "VmName" = $Metadata.compute.name
         "SubscriptionId" = $Metadata.compute.subscriptionId
