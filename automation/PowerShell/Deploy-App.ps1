@@ -31,7 +31,7 @@ param(
 )
 
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
-Start-Transcript -Path $Dir\logs\Deploy-Web.log -Append
+Start-Transcript -Path $Dir\logs\Deploy-Web.log
 
 # Load our provisioning data
 $Provisioning = ((Get-Content $Dir\provisioning.json) -join "`n" | ConvertFrom-Json)

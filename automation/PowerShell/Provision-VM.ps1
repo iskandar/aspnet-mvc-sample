@@ -162,7 +162,7 @@ if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAva
     Install-PackageProvider -Name nuget -Force
 }
 
-if (Get-PSRepository -name PSGallery).InstallationPolicy -ne "Trusted") {
+if ((Get-PSRepository -name PSGallery).InstallationPolicy -ne "Trusted") {
     Write-Host "`n----> Trusting PowerShellGallery Modules"
     Set-PSRepository -InstallationPolicy Trusted -name PSGallery
 }

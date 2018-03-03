@@ -15,8 +15,7 @@ $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
-Start-Transcript -Path $Dir\logs\Configure-Server.log -Append
-Push-Location -Path $Dir
+Start-Transcript -Path $Dir\logs\Configure-Server.log
 
 # Load our provisioning data
 $Provisioning = ((Get-Content $Dir\provisioning.json) -join "`n" | ConvertFrom-Json)
@@ -27,6 +26,8 @@ if ($DryRun -eq "Yes") {
     Stop-Transcript
     exit(0)
 }
+
+Push-Location -Path $Dir
 
 # Get info about host
 # @see https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/collecting-information-about-computers?view=powershell-6configuration
