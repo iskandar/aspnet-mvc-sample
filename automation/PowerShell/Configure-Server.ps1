@@ -1,14 +1,18 @@
 
+# Context: Runs on a target Virtual Machine
+
 [CmdletBinding()]
 param(
-    # Working directory
-    [string] $Dir = "C:\cloud-automation",
-
     # If Dry Run, we don't actually do anything
-    [string] $DryRun = "No"
+    [ValidateSet('Yes','No')]
+    [string] $DryRun = "No",
+
+    # Working directory
+    [string] $Dir = "C:\cloud-automation"
 )
 
 $VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
 
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
 Start-Transcript -Path $Dir\logs\Configure-Server.log -Append

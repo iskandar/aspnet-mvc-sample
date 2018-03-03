@@ -1,7 +1,11 @@
 
+
+# Context: Runs on a target Virtual Machine
+
 [CmdletBinding()]
 param(
     # If Dry Run, we don't actually do anything
+    [ValidateSet('Yes','No')]
     [string] $DryRun = "No",
 
     # Working directory
@@ -40,6 +44,17 @@ if ($DryRun -eq "Yes") {
 }
 
 Push-Location -Path $Dir
+
+function Get-AccessToken([string]$Resource) 
+{
+    $response = Invoke-WebRequest -Verbose `
+        -UseBasicParsing `
+        -Uri http://localhost:50342/oauth2/token `
+        -Method GET `
+        -Headers @{Metadata="true"} `
+        -Body @{resource="$Resource"}
+    return ($response.Content | ConvertFrom-Json).access_token
+}
 
 # On the VM, get a ARM access token for the MSI
 Write-Host "`n----> Getting ARM Token"
@@ -81,7 +96,7 @@ $sasToken = ($sasResponse.Content | ConvertFrom-Json).serviceSasToken
 
 # Set up a Storage Context
 $saContext = New-AzureStorageContext -Verbose `
-    -StorageAccountName $ArtefactStorageAccount `
+    -StorageAccountName $($Provisioning.ArtefactStorageAccount) `
     -SasToken $sasToken
 
 
@@ -95,7 +110,7 @@ function DeployApplication([string] $ApplicationId)
         -Force `
         -Context $saContext `
         -Blob "environments/$($Provisioning.Environment)/$($ApplicationId)" `
-        -Container $ArtefactContainer `
+        -Container $($Provisioning.ArtefactContainer) `
         -Destination $LocalMetadata
 
     if ($ArtefactVersion -eq "latest") {
@@ -112,7 +127,7 @@ function DeployApplication([string] $ApplicationId)
         -Force `
         -Context $saContext `
         -Blob "apps/$ApplicationId/$ArtefactVersion/$ArtefactName" `
-        -Container $ArtefactContainer `
+        -Container $($Provisioning.ArtefactContainer) `
         -Destination $LocalArtefact
 
 

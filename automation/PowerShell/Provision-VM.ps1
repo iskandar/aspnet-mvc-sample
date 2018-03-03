@@ -4,12 +4,16 @@
 # * Configuration (OS, IIS, Agents)
 # * Application Deployment
 #
+# Context: Runs on a target Virtual Machine 
 #
 # This script accepts a large amount of parameters as passed in by the VM Custom Script Extension.
 # Parameters here need to match those in the ARM template invocation of this script.
 #
 [CmdletBinding()]
 param(
+    # If Dry Run, we don't actually do anything
+    [ValidateSet('Yes','No')]
+    [string] $DryRun = "No",
 
     # Working directory
     [string] $Dir = "C:\cloud-automation",
@@ -56,17 +60,14 @@ param(
     [string] $KeyVault = "iskdemo01-kv",
 
     # Application IDs to install automatically
-    [string[]] $ApplicationIds = @("WebApplication1"),
-
-    # If Dry Run, we don't actually do anything
-    [ValidateSet('Yes','No')]
-    [string] $DryRun = "No"
+    [string[]] $ApplicationIds = @("WebApplication1")
 )
 
 $VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
 
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
-Start-Transcript -Path $Dir\logs\Provision-VM.log -Append
+Start-Transcript -Path $Dir\logs\Provision-VM.log
 
 Write-Verbose "`n----> Copying all files to $Dir"
 Copy-Item -Path .\* -Destination $Dir -recurse -Force
@@ -92,7 +93,7 @@ if (-not (Test-Path $Dir\Provisioning.json)) {
         "Namespace" = $Namespace
         # Provisioning source
         "ProvisioningBaseUrl" = $ProvisioningBaseUrl
-        "ProvisioningUrlSuffix" = "not-stored"
+        "ProvisioningUrlSuffix" = $ProvisioningUrlSuffix
         # Artefact Storage values
         "ArtefactSubscriptionId" = $ArtefactSubscriptionId
         "ArtefactResourceGroup" = $ArtefactResourceGroup
@@ -102,7 +103,7 @@ if (-not (Test-Path $Dir\Provisioning.json)) {
         "VstsAccountName" = $VstsAccountName
         "VstsTeamProject" = $VstsTeamProject
         "VstsDeploymentGroup" = $VstsDeploymentGroup
-        "VstsPat" = "not-stored"
+        "VstsPat" = $VstsPat
         # Application List
         "ApplicationIds" = $ApplicationIds
         # KeyVault values
@@ -122,15 +123,49 @@ if (-not (Test-Path $Dir\Provisioning.json)) {
 Write-Verbose "`n----> Provisioning Data:"
 $Provisioning
 
+# A list of assets to download from our ProvisioningBaseUrl
+$RemoteAssets = @(
+    @{
+        "File" = "Provision-VM.ps1"
+        "Path" = ""
+    },
+    @{
+        "File" = "Configure-Server.ps1"
+        "Path" = ""
+    },
+    @{
+        "File" = "Deploy-App.ps1"
+        "Path" = ""
+    },
+    @{
+        "File" = "Apps.ps1"
+        "Path" = ""
+    },
+    @{
+        "File" = "Register-VstsAgent.ps1"
+        "Path" = ""
+    }
+)
+Write-Host "`n----> Fetching remote assets"
+foreach($RemoteAsset in $RemoteAssets) {
+    Write-Host "  ==> $($RemoteAsset.File)"
+    $Url = "$($Provisioning.ProvisioningBaseUrl)$($RemoteAsset.Path)$($RemoteAsset.File)$($Provisioning.ProvisioningUrlSuffix)"
+    curl -Verbose -UseBasicParsing `
+        -OutFile $Dir/$($RemoteAsset.Path)$($RemoteAsset.File) `
+        $Url
+}
+
 # Set up the Nuget package provider
-if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
+if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
 {
     Write-Host "`n----> Installing Package Provider nuget"
     Install-PackageProvider -Name nuget -Force
 }
 
-Write-Host "`n----> Trusting PowerShellGallery Modules"
-Set-PSRepository -InstallationPolicy Trusted -name PSGallery
+if (Get-PSRepository -name PSGallery).InstallationPolicy -ne "Trusted") {
+    Write-Host "`n----> Trusting PowerShellGallery Modules"
+    Set-PSRepository -InstallationPolicy Trusted -name PSGallery
+}
 
 Write-Host "`n----> Installing minimal PS Module requirements"
 Install-Module 'AzureRM.Profile'
@@ -146,11 +181,9 @@ function Get-AccessToken([string]$Resource)
     return ($response.Content | ConvertFrom-Json).access_token
 }
 
-# Wait for MSI Extension to complete
-# Get a token for ARM
+# Wait for MSI Extension to complete, check by getting an ARM token.
+# Retry till we can get a token. This is only needed until we can sequence extensions in VMSS (someday).
 $retry = 0; $maxRetries = 10; $retryDelay = 30
-
-# Retry till we can get a token, this is only needed until we can sequence extensions in VMSS
 $success = $false
 while(!$success) {
     try {
@@ -205,6 +238,14 @@ Write-Host "`n----> Running Configure-Server"
 .\Configure-Server.ps1 `
     -DryRun $DryRun `
     -Dir $Dir 
+
+Write-Host "`n----> Running Register-VstsAgent"
+.\Register-VstsAgent.ps1 `
+    -DryRun $DryRun `
+    -VstsAccountName "$($Provisioning.VstsAccountName)" `
+    -VstsTeamProject "$($Provisioning.VstsTeamProject)" `
+    -VstsDeploymentGroup "$($Provisioning.VstsDeploymentGroup)" `
+    -VstsPat "$($Provisioning.VstsPat)"
 
 Write-Host "`n----> Running Deploy-App"
 foreach($ApplicationId in $ApplicationIds) {
