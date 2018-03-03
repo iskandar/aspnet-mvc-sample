@@ -94,22 +94,20 @@ if (-not $Installed) {
 }
 
 # Wait for MSDeploy to be installed
-$retry = 0; $maxRetries = 50; $retryDelay = 10
-$success = $false
-while(!$success) {
-    try {
-        $retry += 1
-        Write-Host "`n[$(Get-Date)]----> Checking for WebDeploy installation, attempt #$retry"          
-        $success = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
-        if (!$success) { throw "WebDeploy not found" }
+$retry = 0; $maxRetries = 20; $retryDelay = 6
+do {
+    $retry += 1
+    Write-Host "`n[$(Get-Date)] ----> Checking for WebDeploy installation, attempt #$retry"          
+    $Installed = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
+    if ($Installed) {
         Write-Host -BackgroundColor DarkGreen "[$(Get-Date)]  ==> WebDeploy installed"
-    } catch {
-        Write-Error "[$(Get-Date)]  ==> $_"
-        if ($retry -gt $maxRetries) { throw $_ }
-        Write-Host "[$(Get-Date)]  ==> Sleeping for $retryDelay seconds..."
-        Start-Sleep $retryDelay
+        continue    
     }
-}
+    if ($retry -gt $maxRetries) { throw "Could not find WebDeploy. Did installation fail?"}
+    Write-Host "[$(Get-Date)]  ==> Sleeping for $retryDelay seconds..."
+    Start-Sleep $retryDelay
+} while(-not $Installed) 
+
 
 Write-Host "`n`n[$(Get-Date)] ---->All Done!"
 
