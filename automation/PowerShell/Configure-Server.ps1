@@ -56,7 +56,7 @@ Write-Host "`n[$(Get-Date)] ----> Installing PowerShell Modules"
 foreach($module in $modules) 
 {
     if (Get-Module -Name $module -ListAvailable) { continue  }
-    Write-Host "`n[$(Get-Date)] ==> $module "
+    Write-Host "`n[$(Get-Date)]   ==> $module "
     Install-Module $module
     # Import Modules (useful when running in the ISE)
     # Import-Module -Name $module
@@ -76,10 +76,11 @@ Write-Host "`n[$(Get-Date)] ----> Installing Windows Features"
 foreach($feature in $features) 
 {
     if ((Get-WindowsFeature $feature).Installed) { continue }
-    Write-Host "`n[$(Get-Date)] ==> $feature"
+    Write-Host "`n[$(Get-Date)]   ==> $feature"
     Install-WindowsFeature $feature
 }
 
+# Download and install WebDeploy directly from the Microsoft download site
 $Installed = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
 if (-not $Installed) {
     Write-Host "`n[$(Get-Date)] ----> Downloading WebDeploy installer [$(Get-Date)]"
@@ -90,6 +91,24 @@ if (-not $Installed) {
     Write-Host "`n[$(Get-Date)] ----> Installing WebDeploy"
     # msiexec works best with absolute filesystem paths
     msiexec /L $Dir\logs\WebDeploy-Install.log /quiet /norestart /package $Dir\artefacts\webdeploy.msi
+}
+
+# Wait for MSDeploy to be installed
+$retry = 0; $maxRetries = 50; $retryDelay = 10
+$success = $false
+while(!$success) {
+    try {
+        $retry += 1
+        Write-Host "`n[$(Get-Date)]----> Checking for WebDeploy installation, attempt #$retry"          
+        $success = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
+        if (!$success) { throw "WebDeploy not found" }
+        Write-Host -BackgroundColor DarkGreen "[$(Get-Date)]  ==> WebDeploy installed"
+    } catch {
+        Write-Error "[$(Get-Date)]  ==> $_"
+        if ($retry -gt $maxRetries) { throw $_ }
+        Write-Host "[$(Get-Date)]  ==> Sleeping for $retryDelay seconds..."
+        Start-Sleep $retryDelay
+    }
 }
 
 Write-Host "`n`n[$(Get-Date)] ---->All Done!"

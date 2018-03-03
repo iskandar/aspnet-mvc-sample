@@ -59,7 +59,7 @@ $VaultToken = Get-AccessToken -Resource "https://vault.azure.net/"
 # Expire this credential in 10 minutes
 Write-Host "`n----> Getting SAS Token"
 $expiry = (Get-Date).AddMinutes(10).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-Write-Host "==> Expiry: $expiry"
+Write-Host "  ==> Expiry: $expiry"
 $params = @{
     canonicalizedResource="/blob/$($Provisioning.ArtefactStorageAccount)/$($Provisioning.ArtefactContainer)";
     signedResource="c"; signedPermission="rl"; signedProtocol="https";
@@ -159,10 +159,16 @@ function DeployApplication([string] $ApplicationId)
             "-setparam:name='DeployUrl',value='$($DeployUrl)'",
             "-allowUntrusted")
         
+    Write-Host "`n----> arguments for msdeploy.exe"
+    $arguments
+    
+    Write-Host "`n----> Running $($msdeploy)"
     $job = Start-Process $msdeploy -Verbose -ArgumentList $arguments -NoNewWindow -Wait -PassThru
     if ($job.ExitCode -ne 0) {
-        echo $job.StandardOutput
-        echo $job.StandardError
+        Write-Host "`nstdout"
+        Write-Host $job.StandardOutput
+        Write-Host "`nstderr"
+        Write-Host $job.StandardError
         throw('msdeploy exited with an error. ExitCode:' + $job.ExitCode)
     }
     Write-Host "`n----> Done deploying $($ApplicationId)"

@@ -161,11 +161,11 @@ while(!$success) {
         # Also get a Key Vault access token for the MSI
         # $VaultToken = Get-AccessToken -Resource "https://vault.azure.net/"
         $success = $true
-        Write-Host -BackgroundColor DarkGreen "==> Got ARM token"
+        Write-Host -BackgroundColor DarkGreen "  ==> Got ARM token"
     } catch {
-        Write-Error "==> Exception $_ trying to get ARM Token"
+        Write-Error "  ==> Exception $_ trying to get ARM Token"
         if ($retry -gt $maxRetries) { throw $_ }
-        Write-Host "==> Sleeping for $retryDelay seconds..."
+        Write-Host "  ==> Sleeping for $retryDelay seconds..."
         Start-Sleep $retryDelay
     }
 }
@@ -185,11 +185,11 @@ while(!$success) {
             throw "Subscription Id $($Provisioning.SubscriptionId) not in context" 
         }
         $success = $true
-        Write-Host -BackgroundColor DarkGreen "==> Found Subscription ID $($Provisioning.SubscriptionId)"
+        Write-Host -BackgroundColor DarkGreen "  ==> Found Subscription ID $($Provisioning.SubscriptionId)"
     } catch {
-        Write-Error "==> Exception $_ trying to Login"
+        Write-Error "  ==> Exception $_ trying to Login"
         if ($retry -gt $maxRetries) { throw $_ }
-        Write-Host "==> Sleeping for $retryDelay seconds..."
+        Write-Host "  ==> Sleeping for $retryDelay seconds..."
         Start-Sleep $retryDelay
     }
 }
@@ -198,7 +198,7 @@ Write-Host "`n----> App Metadata:"
 $Apps = $(. .\Apps.ps1)
 $Apps
 
-Write-Host "`n----> Done! Delegated to other scripts..."
+Write-Host "`n----> Done! Delegating to other scripts..."
 Stop-Transcript
 
 Write-Host "`n----> Running Configure-Server"
@@ -210,11 +210,11 @@ Write-Host "`n----> Running Deploy-App"
 foreach($ApplicationId in $ApplicationIds) {
     # Look up the Application metadata
     if (-not $Apps.ContainsKey($ApplicationId)) {
-        Write-Warning "==> $ApplicationId not found in list of apps"
+        Write-Warning "  ==> $ApplicationId not found in list of apps"
         continue
     }
     $AppMetadata = $Apps.$ApplicationId
-    Write-Host "==> $($ApplicationId): $($AppMetadata.WebSiteName)"
+    Write-Host "  ==> $($ApplicationId): $($AppMetadata.WebSiteName)"
     .\Deploy-App.ps1 `
         -DryRun $DryRun `
         -Dir $Dir `
