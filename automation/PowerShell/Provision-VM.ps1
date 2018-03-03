@@ -209,7 +209,7 @@ foreach($ApplicationId in $ApplicationIds) {
         continue
     }
     $AppMetadata = $Apps.$ApplicationId
-    Write-Host "==> $ApplicationId: $($AppMetadata.WebSiteName)"
+    Write-Host "==> $($ApplicationId): $($AppMetadata.WebSiteName)"
     .\Deploy-App.ps1 `
         -DryRun $DryRun `
         -Dir $Dir `
