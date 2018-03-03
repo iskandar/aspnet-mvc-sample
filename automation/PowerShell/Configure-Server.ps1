@@ -38,7 +38,9 @@ if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailab
     Write-Host "`n----> Installing Package Provider nuget"
     Install-PackageProvider -Name nuget -Force
 }
+
 # Let's trust the PSGallery source
+# WARNING: This may be a security issue, please don't continue blindly using this.
 Write-Host "`n----> Setting up policies for PowerShellGallery source"
 Set-PackageSource -Trusted -Name PSGallery -ProviderName PowerShellGet
 Set-PSRepository -InstallationPolicy Trusted -name PSGallery
@@ -48,10 +50,11 @@ $modules = @(
     'AzureRM.Compute'
     'AzureRM.KeyVault'
     'AzureRM.Profile'
-    'Azure.Storage'
+    'Azure.Storage'    
     'WebPI.PS' 
     # NOTE: WebPI.PS is a community module and will need to be either
     # vetted & forked or replaced with something else (like a direct install from .MSI)
+    # @TODO Kill WebPI and use a direct Web Deploy installation method. WebPI is slow.
     # @see https://www.iis.net/downloads/microsoft/web-deploy#additionalDownloads
 )
 Write-Host "`n----> Installing PowerShell Modules"
@@ -59,7 +62,7 @@ foreach($module in $modules)
 {
     Write-Host "`n==> $module"
     if (Get-Module -Name $module -ListAvailable) { continue }
-    Install-Module $module -Force
+    Install-Module $module
     # Import Modules (useful when running in the ISE)
     # Import-Module -Name $module
 }
@@ -91,6 +94,8 @@ foreach($package in $packages)
     Write-Host "`n==> $package"
     Invoke-WebPI /Install /Products:$package /AcceptEula
 }
+
+Write-Host "-`n---> All installed Web Platform Installer packages:"
 Invoke-WebPI /List /ListOption:Installed
 
 Write-Host "`n`n---->All Done!"

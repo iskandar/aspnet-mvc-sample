@@ -60,7 +60,11 @@ param(
 $VerbosePreference = "Continue"
 
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
-# Start-Transcript -Path $Dir\logs\Provision-VM.log -Append
+Start-Transcript -Path $Dir\logs\Provision-VM.log -Append
+
+Write-Verbose "`n----> Copying all files to $Dir"
+Copy-Item -Path .\* -Destination $Dir -recurse -Force
+
 Push-Location -Path $Dir
 
 # Get data from Instance metadata
@@ -72,30 +76,46 @@ $Metadata = $(Invoke-RestMethod `
     -Method GET)
 
 # Create an object with our create-time Environment-specific configuration
-Write-Verbose "`n----> Environment Config vars:"
-$ArtefactSubscriptionId = if ($ArtefactSubscriptionId) { $ArtefactSubscriptionId } else { $Metadata.compute.subscriptionId }
-$Provisioning = @{
-    "Environment" = $Environment
-    "Namespace" = $Namespace
-    "ArtefactSubscriptionId" = $ArtefactSubscriptionId
-    "ArtefactResourceGroup" = $ArtefactResourceGroup
-    "ArtefactStorageAccount" = $ArtefactStorageAccount
-    "ArtefactContainer" = $ArtefactContainer
-    "KeyVault" = $KeyVault
-    # VSTS Settings
-    "VstsAccountName" = $VstsAccountName
-    "VstsTeamProject" = $VstsTeamProject
-    "VstsDeploymentGroup" = $VstsDeploymentGroup
-    # Application List
-    "ApplicationIds" = $ApplicationIds
-    # Add Instance Metadata
-    "VmName" = $Metadata.compute.name
-    "SubscriptionId" = $Metadata.compute.subscriptionId
-    "ResourceGroup" = $Metadata.compute.resourceGroupName
-    "Location" = $Metadata.compute.location
+if (-not (Test-Path $Dir\Provisioning.json)) {
+    $ArtefactSubscriptionId = if ($ArtefactSubscriptionId) { $ArtefactSubscriptionId } else { $Metadata.compute.subscriptionId }
+    $Provisioning = @{
+        "Environment" = $Environment
+        "Namespace" = $Namespace
+        "ArtefactSubscriptionId" = $ArtefactSubscriptionId
+        "ArtefactResourceGroup" = $ArtefactResourceGroup
+        "ArtefactStorageAccount" = $ArtefactStorageAccount
+        "ArtefactContainer" = $ArtefactContainer
+        "KeyVault" = $KeyVault
+        # VSTS Settings
+        "VstsAccountName" = $VstsAccountName
+        "VstsTeamProject" = $VstsTeamProject
+        "VstsDeploymentGroup" = $VstsDeploymentGroup
+        # Application List
+        "ApplicationIds" = $ApplicationIds
+        # Add Instance Metadata
+        "VmName" = $Metadata.compute.name
+        "SubscriptionId" = $Metadata.compute.subscriptionId
+        "ResourceGroup" = $Metadata.compute.resourceGroupName
+        "Location" = $Metadata.compute.location
+    }
+    ConvertTo-Json -InputObject $Provisioning > $Dir\Provisioning.json
+} else {
+    # Load our provisioning data
+    $Provisioning = ((Get-Content $Dir\provisioning.json) -join "`n" | ConvertFrom-Json)
 }
-ConvertTo-Json -InputObject $Provisioning | Tee $Dir\Provisioning.json
 
+Write-Verbose "`n----> Provisioning Data:"
+$Provisioning
+
+# Set up the Nuget package provider
+if (!(Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
+{
+    Write-Host "`n----> Installing Package Provider nuget"
+    Install-PackageProvider -Name nuget -Force
+}
+
+Write-Host "`n----> Installing minimal PS Module requirements"
+Install-Module 'AzureRM.Profile'
 
 function Get-AccessToken([string]$Resource) 
 {
@@ -132,6 +152,7 @@ while(!$success) {
     }
 }
 
+
 # Check for Subscription ID linked to this MSI
 $retry = 0; $maxRetries = 10; $retryDelay = 30
 $success = $false
@@ -155,19 +176,33 @@ while(!$success) {
     }
 }
 
- Write-Host "`n----> Running Configure-Server"
+Write-Host "`n----> App Metadata:"
+$Apps = $(. .\Apps.ps1)
+AppMetadata
+
+Write-Host "`n----> Done! Delegated to other scripts..."
+Stop-Transcript
+
+Write-Host "`n----> Running Configure-Server"
 .\Configure-Server.ps1 `
     -DryRun $DryRun `
     -Dir $Dir 
 
 Write-Host "`n----> Running Deploy-App"
 foreach($ApplicationId in $ApplicationIds) {
-    Write-Host "==> $ApplicationId"
+    # Look up the Application metadata
+    if (-not $Apps.ContainsKey($ApplicationId)) {
+        Write-Warning "==> $ApplicationId not found in list of apps"
+        continue
+    }
+    $AppMetadata = $Apps.$ApplicationId
+    Write-Host "==> $ApplicationId: $($AppMetadata.WebSiteName)"
     .\Deploy-App.ps1 `
         -DryRun $DryRun `
         -Dir $Dir `
         -DeployNumber "Release-Local" `
-        -DeployUrl "http://localhost" `
+        -DeployUrl "http://$($Provisioning.VmName)/local-deploy" `
         -ApplicationId $ApplicationId `
-        -ArtefactName "$ApplicationId.zip"
+        -ArtefactName "$($AppMetadata.ArtefactName)" `
+        -WebSiteName "$($AppMetadata.WebSiteName)"
 }
