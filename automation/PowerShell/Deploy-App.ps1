@@ -131,6 +131,15 @@ function DeployApplication([string] $ApplicationId)
         -Destination $LocalArtefact
 
 
+    Invoke-WebRequest -Verbose -Debug `
+        -Uri "https://iskdemo01-kv.vault.azure.net/keys?api-version=2016-10-01" `
+        -Method GET `
+        -Headers @{Authorization="Bearer $VaultToken"}
+
+TOKEN=$(cat token.txt)
+curl -vv -H "Authorisation: Bearer $TOKEN" "https://iskdemo01-kv.vault.azure.net/keys?api-version=2016-10-01"
+
+
     # Get Environment-specific settings
     # Get Environment-specific secrets
     # @TODO Fetch things from Key Vault

@@ -69,10 +69,6 @@ $ErrorActionPreference = "Stop"
 New-Item -Path $Dir\logs -ItemType Directory -ErrorAction SilentlyContinue
 Start-Transcript -Path $Dir\logs\Provision-VM.log
 
-Write-Verbose "`n----> Copying all files to $Dir"
-Copy-Item -Path .\* -Destination $Dir -recurse -Force
-
-Push-Location -Path $Dir
 New-Item -Path $Dir\artefacts -ItemType Directory -ErrorAction SilentlyContinue
 New-Item -Path $Dir\environments -ItemType Directory -ErrorAction SilentlyContinue
 
@@ -151,9 +147,14 @@ foreach($RemoteAsset in $RemoteAssets) {
     Write-Host "  ==> $($RemoteAsset.File)"
     $Url = "$($Provisioning.ProvisioningBaseUrl)$($RemoteAsset.Path)$($RemoteAsset.File)$($Provisioning.ProvisioningUrlSuffix)"
     curl -Verbose -UseBasicParsing `
-        -OutFile $Dir/$($RemoteAsset.Path)$($RemoteAsset.File) `
+        -OutFile $($RemoteAsset.Path)$($RemoteAsset.File) `
         $Url
 }
+
+Write-Verbose "`n----> Copying all assets to $Dir"
+Copy-Item -Path .\* -Destination $Dir -recurse -Force
+
+Push-Location -Path $Dir
 
 # Set up the Nuget package provider
 if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable)) 
@@ -235,12 +236,12 @@ Write-Host "`n----> Done! Delegating to other scripts..."
 Stop-Transcript
 
 Write-Host "`n----> Running Configure-Server"
-.\Configure-Server.ps1 `
+$Dir\Configure-Server.ps1 `
     -DryRun $DryRun `
     -Dir $Dir 
 
 Write-Host "`n----> Running Register-VstsAgent"
-.\Register-VstsAgent.ps1 `
+$Dir\Register-VstsAgent.ps1 `
     -DryRun $DryRun `
     -VstsAccountName "$($Provisioning.VstsAccountName)" `
     -VstsTeamProject "$($Provisioning.VstsTeamProject)" `
@@ -256,7 +257,7 @@ foreach($ApplicationId in $ApplicationIds) {
     }
     $AppMetadata = $Apps.$ApplicationId
     Write-Host "  ==> $($ApplicationId): $($AppMetadata.WebSiteName)"
-    .\Deploy-App.ps1 `
+    $Dir\Deploy-App.ps1 `
         -DryRun $DryRun `
         -Dir $Dir `
         -DeployNumber "Release-Local" `
