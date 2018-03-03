@@ -157,14 +157,14 @@ while(!$success) {
 
  Write-Host "`n----> Running Configure-Server"
 .\Configure-Server.ps1 `
-    -DryRun No `
+    -DryRun $DryRun `
     -Dir $Dir 
 
 Write-Host "`n----> Running Deploy-App"
 foreach($ApplicationId in $ApplicationIds) {
     Write-Host "==> $ApplicationId"
     .\Deploy-App.ps1 `
-        -DryRun No `
+        -DryRun $DryRun `
         -Dir $Dir `
         -DeployNumber "Release-Local" `
         -DeployUrl "http://localhost" `
