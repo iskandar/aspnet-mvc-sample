@@ -72,6 +72,8 @@ Write-Verbose "`n----> Copying all files to $Dir"
 Copy-Item -Path .\* -Destination $Dir -recurse -Force
 
 Push-Location -Path $Dir
+New-Item -Path $Dir\artefacts -ItemType Directory -ErrorAction SilentlyContinue
+New-Item -Path $Dir\environments -ItemType Directory -ErrorAction SilentlyContinue
 
 # Get data from Instance metadata
 # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service

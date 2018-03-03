@@ -40,8 +40,6 @@ if ($DryRun -eq "Yes") {
 }
 
 Push-Location -Path $Dir
-New-Item -Path $Dir\artefacts -ItemType Directory -ErrorAction SilentlyContinue
-New-Item -Path $Dir\environments -ItemType Directory -ErrorAction SilentlyContinue
 
 # On the VM, get a ARM access token for the MSI
 Write-Host "`n----> Getting ARM Token"
