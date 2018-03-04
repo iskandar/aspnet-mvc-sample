@@ -105,7 +105,7 @@ do {
     Write-Host "`n[$(Get-Date)] ----> Checking for WebDeploy installation, attempt #$retry"          
     $Installed = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" -ErrorAction SilentlyContinue)
     if ($Installed) {
-        Write-Host -BackgroundColor DarkGreen "[$(Get-Date)]  ==> WebDeploy installed"
+        Write-Host -BackgroundColor DarkGreen "[$(Get-Date)]   ==> WebDeploy installed"
         continue    
     }
     if ($retry -gt $maxRetries) { throw "Could not find WebDeploy. Did installation fail?"}
